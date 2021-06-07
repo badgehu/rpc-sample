@@ -6,13 +6,15 @@ import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.Socket;
+import java.util.Map;
 
 public class ProcessorHandler implements Runnable{
     private Socket socket;
-    private Object service;
+//    private Object service;
+    private Map<String,Object> handlerMap;
 
-    public ProcessorHandler(Object service,Socket socket){
-        this.service = service;
+    public ProcessorHandler(Map<String,Object> handlerMap,Socket socket){
+        this.handlerMap = handlerMap;
         this.socket = socket;
     }
 
@@ -56,6 +58,11 @@ public class ProcessorHandler implements Runnable{
     }
 
     private Object invoke(RpcRequest request) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        String serviceName = request.getClassName();
+        Object service = handlerMap.get(serviceName);
+        if (service == null){
+            throw new RuntimeException("service not found:"+serviceName);
+        }
         Object[] args = request.getParameters();
         Class<?>[] types = new Class[args.length];
         for (int i = 0; i < args.length; i++) {
