@@ -1,5 +1,7 @@
 package com.badgehu.rpc;
 
+import org.springframework.util.StringUtils;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -59,6 +61,12 @@ public class ProcessorHandler implements Runnable{
 
     private Object invoke(RpcRequest request) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         String serviceName = request.getClassName();
+        // 增加服务版本号
+        String version = request.getVersion();
+        if(!StringUtils.isEmpty(version)){
+            serviceName+="-"+version;
+        }
+
         Object service = handlerMap.get(serviceName);
         if (service == null){
             throw new RuntimeException("service not found:"+serviceName);

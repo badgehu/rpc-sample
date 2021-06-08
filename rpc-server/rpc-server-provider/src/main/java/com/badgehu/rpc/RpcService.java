@@ -13,4 +13,6 @@ import java.lang.annotation.Target;
 @Component
 public @interface RpcService {
     Class<?> value(); // 获取需要发布服务接口
+    // 注解增加版本号，兼容
+    String version() default "";
 }
